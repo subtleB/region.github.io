@@ -2,19 +2,17 @@
 
 
 $('document').ready(function() {
-    
-    var checkedFlag = true;
-    getName();
-
-    displayAllGroups();
 
     var url = new URL(document.URL);
     var TOKEN = url.searchParams.get("access_token");
-
+    console.log(TOKEN);
     if (TOKEN) {
         $('#login').hide();
     } 
 
+    var checkedFlag = true;
+    getName();
+    displayAllGroups();
 
     $('.go').submit(function(e) {
         e.preventDefault();
