@@ -3,7 +3,8 @@
 
 $('document').ready(function() {
 
-    var url = new URL(document.URL);
+    var url = new URL(document.URL.replace("#", "?"));
+
     var TOKEN = url.searchParams.get("access_token");
     console.log(TOKEN);
     if (TOKEN) {
