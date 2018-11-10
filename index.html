@@ -1,0 +1,101 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+
+        <style> 
+            .green {
+                background-color: #dcffdc;
+            }
+
+            .group {
+                float: left;
+                margin: 5px;
+                width: 340px;
+                height: 50px;
+                overflow: hidden;
+                border: 1px solid;
+                border-radius: 5px;
+            }
+
+            .group img {
+                height: 50px;
+                width: 50px;
+                margin-right: 6px;
+            }
+
+            .clearfix:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            .group_name {
+                width: 90%;
+                float: left;
+                height: 50px;
+                word-break: break-all;
+            }
+
+            .options {
+                height: 50px;
+                width: 10%;
+                float: right;
+                padding-left: 10px;
+                box-sizing: border-box;
+            }
+
+            .options input {
+                margin-top: 15px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <h2>Аккаунт</h2>
+        <label id = "name">Текущий аккаунт: </label>
+        <a href = "https://oauth.vk.com/authorize?&display=popup&client_id=6639687&redirect_uri=https://oauth.vk.com/blank.html&scope=groups,messages,wall,offline&response_type=token&v=5.62"> Войти</a>
+        <hr>
+        <button id = "checkSwitch">Поставить/убрать все галки</button>
+        <div id = 'groups' class = "clearfix"> </div>
+
+        <div class = "sendToGroups">
+        <h2>Шапки в группы</h2>
+		<form class="go">
+            <label>Текст шапки.</label> <br>
+            <textarea style='width:400px; height: 250px' id = "msg"></textarea> <br>  
+
+            <label>Фото </label> <br>
+            <input style='width:400px;' type="text" id="photo"> <br>
+
+			<button id ="goBtn" type="submit">Разослать шапку</button>
+		</form>
+        </div>
+        <!--<hr>
+        <h2>Приватные сообщения</h2>
+        <label>Сообщение, которое будет отправлено всем, кто лайкнул посты на стене.</label> <br>
+        <textarea id = "privateMsg"></textarea> <br>
+        <button id ="sendMsg" type="submit">Отправить сообщение</button> -->
+        <div id = "report"> </div>
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>
