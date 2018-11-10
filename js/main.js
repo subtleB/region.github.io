@@ -2,13 +2,19 @@
 
 
 $('document').ready(function() {
-    var TOKEN = '';
+    
     var checkedFlag = true;
     getName();
 
     displayAllGroups();
 
-    console.log(document.URL);
+    var url = new URL(document.URL);
+    var TOKEN = url.searchParams.get("access_token");
+
+    if (TOKEN) {
+        $('#login').hide();
+    } 
+
 
     $('.go').submit(function(e) {
         e.preventDefault();
