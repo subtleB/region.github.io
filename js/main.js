@@ -3,17 +3,18 @@
 
 $('document').ready(function() {
 
-    var url = new URL(document.URL.replace("#", "?"));
+    //var url = new URL(document.URL.replace("#", "?"));
+    //var TOKEN = url.searchParams.get("access_token");
+    //console.log(TOKEN);
+    //if (TOKEN) {
+    //    $('#login').hide();
+    //}
 
-    var TOKEN = url.searchParams.get("access_token");
-    console.log(TOKEN);
-    if (TOKEN) {
-        $('#login').hide();
-    } 
+    var TOKEN = "";
 
     var checkedFlag = true;
-    getName();
-    displayAllGroups();
+    //getName();
+    //displayAllGroups();
 
     $('.go').submit(function(e) {
         e.preventDefault();
@@ -37,9 +38,9 @@ $('document').ready(function() {
     });
 
     $('#sendMsg').click(function(e) {
-        //e.preventDefault();
-        //var msg = $('#privateMsg').val();
-        //sendToNewWallLikes(msg);
+        e.preventDefault();
+        var msg = $('#privateMsg').val();
+        sendToNewWallLikes(msg);
         //sendMsg(103767511, msg);
     });
 
@@ -51,7 +52,11 @@ $('document').ready(function() {
         checkedFlag = checkedFlag ? false : true;
     });
 
-    
+    $('#token').on('input',function(e){
+        var url = new URL( $('#token').val().replace("#", "?"));
+        TOKEN = url.searchParams.get("access_token");
+        getName();
+    });
 
     function post(inputBox, msg, photo) {
         var id = $(inputBox).val();
@@ -143,13 +148,16 @@ $('document').ready(function() {
             url: 'https://api.vk.com/method/account.getProfileInfo?&access_token=' + TOKEN + '&v=5.62',
             success: function(res) {
                 console.log(res);
-                $('#name').append(res.response.first_name + " " + res.response.last_name);
-                //report.append(res.response + '<br>');
+                $('#name').html(res.response.first_name + " " + res.response.last_name);
+                $('#login').hide();
+                $('#token').hide();
+                displayAllGroups();
             }
         });
     }
 
     function displayAllGroups() {
+        $('#groups').html("");
         $.ajax({
             dataType: 'jsonp',
             method: 'GET',
