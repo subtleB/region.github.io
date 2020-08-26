@@ -19,22 +19,6 @@
                 background-color: #dcffdc;
             }
 
-            .group {
-                float: left;
-                margin: 5px;
-                width: 340px;
-                height: 50px;
-                overflow: hidden;
-                border: 1px solid;
-                border-radius: 5px;
-            }
-
-            .group img {
-                height: 50px;
-                width: 50px;
-                margin-right: 6px;
-            }
-
             .clearfix:after {
                 content: "";
                 display: table;
@@ -60,6 +44,10 @@
                 margin-top: 15px;
             }
 
+            td, th {
+                padding : 5px;
+            }
+
         </style>
     </head>
     <body>
@@ -73,8 +61,20 @@
         <a id = "login" href = "https://oauth.vk.com/authorize?&display=popup&client_id=6639687&redirect_uri=https://oauth.vk.com/blank.html&scope=groups,wall,offline&response_type=token&v=5.62"> Получить токен</a>
         <input id = "token" type="text">
         <hr>
+
         <button id = "checkSwitch">Поставить/убрать все галки</button>
+
+        <button id = "joinGroups">Вступить в выбранные группы</button>
+        <br>
+        <label>Поиск: </label>
+        <br>
+        <input id = "search" type="text"> от <input id = "members" type="number"> участников,
+        задержка <input id = "delay" type="number"> секунд
+        <button id = "goSearch">Поиск</button>
+
+
         <div id = 'groups' class = "clearfix"> </div>
+
 
         <div class = "sendToGroups">
         <h2>Шапки в группы</h2>
@@ -88,12 +88,6 @@
 			<button id ="goBtn" type="submit">Разослать шапку</button>
 		</form>
         </div>
-        <!--<hr>
-        <h2>Приватные сообщения</h2>
-        <label>Сообщение, которое будет отправлено всем, кто лайкнул посты на стене.</label> <br>
-        <textarea id = "privateMsg"></textarea> <br>
-        <button id ="sendMsg" type="submit">Отправить сообщение</button>
-        <div id = "report"> </div>-->
         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>

@@ -1,20 +1,12 @@
-//https://oauth.vk.com/authorize?&display=popup&client_id=6639687&redirect_uri=https://oauth.vk.com/blank.html&scope=groups,messages,wall,offline&response_type=token&v=5.62
-
 
 $('document').ready(function() {
-
-    //var url = new URL(document.URL.replace("#", "?"));
-    //var TOKEN = url.searchParams.get("access_token");
-    //console.log(TOKEN);
-    //if (TOKEN) {
-    //    $('#login').hide();
-    //}
-
     var TOKEN = "";
 
+    var MAX = 10e9;
+
     var checkedFlag = true;
-    //getName();
-    //displayAllGroups();
+
+    var DEFAULT_DELAY = 1
 
     $('.go').submit(function(e) {
         e.preventDefault();
@@ -23,12 +15,17 @@ $('document').ready(function() {
 
         $('#goBtn').hide();
 
+        var delay = $("#delay").val();
+        if (delay == "") {
+            delay = DEFAULT_DELAY;
+        }
+
         var interval = 0;
         var groups = $('#groups').find("input");
         for (var i = 0; i < groups.length; i++) {
             if (groups[i].checked) {
                 interval++;
-                setTimeout(post, 500 * interval, groups[i], msg, photo);
+                setTimeout(post, 1000 * delay * interval, groups[i], msg, photo);
             }
         }
 
@@ -44,6 +41,31 @@ $('document').ready(function() {
         //sendMsg(103767511, msg);
     });
 
+    $('#joinGroups').click(function(e) {
+        e.preventDefault();
+
+        $('#joinGroups').hide();
+
+        var delay = $("#delay").val();
+        if (delay == "") {
+            delay = DEFAULT_DELAY;
+        }
+
+        var interval = 0;
+        var groups = $('#groups').find("input");
+        for (var i = 0; i < groups.length; i++) {
+            if (groups[i].checked) {
+                interval++;
+                setTimeout(join, 1000 * delay * interval, groups[i]);
+            }
+        }
+
+        setTimeout(function() {
+            $('#joinGroups').show();
+        }, 1000);
+
+    });
+
     $('#checkSwitch').click(function(e) {
         var groups = $('#groups').find("input");
         for (var i = 0; i < groups.length; i++) {
@@ -57,6 +79,61 @@ $('document').ready(function() {
         TOKEN = url.searchParams.get("access_token");
         getName();
     });
+
+    $('#goSearch').click(function(e) {
+        var search = $('#search').val();
+        $.ajax({
+            dataType: 'jsonp',
+            method: 'GET',
+            url: 'https://api.vk.com/method/groups.search?&access_token=' + TOKEN + '&v=5.62&count=1000&q=' + search,
+            success: function(res) {
+                var part1 = getGroupsById(getGroupsId(res, 0, 400));
+                var part2 = getGroupsById(getGroupsId(res, 400, 800));
+
+                $.when(part1, part2).done(function(x1, x2) {
+                    console.log(x1, x2);
+                    res = x1[0].response.concat(x2[0].response);
+                    displayGroupsSearch(res);
+                });
+            }
+        });
+    });
+
+    function getGroupsById(groups) {
+        return $.ajax({
+            dataType: 'jsonp',
+            method: 'GET',
+            url: 'https://api.vk.com/method/groups.getById?&access_token=' + TOKEN 
+                + '&v=5.103&fields=can_post,members_count,city,wall&group_ids=' + groups
+        });
+    }
+
+    function getGroupsId(groups, from, to) {
+        var ids = "";
+        for (var i = from; i < to; i++) {
+            ids += groups.response.items[i].id;
+            if (i < to - 1) {
+                ids += ",";
+            }
+        }
+        return ids;
+    }
+
+    function join(inputBox) {
+        var id = $(inputBox).val();
+        $.ajax({
+            dataType: 'jsonp',
+            method: 'GET',
+            url: 'https://api.vk.com/method/groups.join?group_id=' + id + '&access_token=' + TOKEN + '&v=5.62', 
+            success: function(res) {
+                console.log(res);
+                $(inputBox).parent().css("background-color","green");
+                setTimeout(function() {
+                    $(inputBox).parent().css("background-color","initial");
+                }, 5000);
+            }
+        });
+    };
 
     function post(inputBox, msg, photo) {
         var id = $(inputBox).val();
@@ -156,28 +233,100 @@ $('document').ready(function() {
         });
     }
 
-    function displayAllGroups() {
+    function displayGroupsSearch(res) {
+        res.sort(function(a, b) {
+            return b.members_count - a.members_count;
+        });
+
+        var members = $("#members").val();
+        if (members == "") {
+            members = MAX;
+        }
+
         $('#groups').html("");
+        var table = "<table border='1'><tr><th></th><th>Название</th><th>Кол-во участников</th><th>Город</th><th>Тип</th><th>Стена</th><th></th></tr>"
+
+        for (var i = 0; i < res.length; i++) {
+            var group = res[i];
+
+            if (group.members_count < members) {
+                break;
+            }
+
+            console.log(group);
+            var color = "";
+            if (group.can_post == 1) {
+                color = "green";
+            } 
+            var openness = group.is_closed === 0 ? "Открытое" : "Закрытое";
+            var page_group = group.type === "page" ? "Страница" : "Группа";
+            var city = group.city === undefined ? "" : group.city.title;
+            var wall = group.wall === 0 ? "Выключена" : group.wall === 1 ? 
+                    "Открытая" : group.wall === 2 ? "Ограниченная" : "Закрытая";
+
+            var image = "<a target='_blank' href ='https://vk.com/" + group.screen_name + "'" + "><img src=" + group.photo_50 + "></a>";
+
+            var row = "<tr class = 'group "+ color + "'>" +
+                "<td>" + image + "</td>" +
+                "<td>" + group.name + "</td>" + 
+                "<td>" + group.members_count + "</td>" + 
+                "<td>" + city + "</td>" + 
+                "<td>" + page_group + " / " + openness +  "</td>" +
+                "<td>" + wall +  "</td>" + 
+                "<td><input type='checkbox' value = '" + group.id + "'/></td>" + 
+                
+            "</tr>"
+
+            table += row;
+        }
+
+        $('#groups').append(table + "</table>");
+    }
+
+    function displayGroups(res) {
+        $('#groups').html("");
+        var table = "<table border='1'><tr><th></th><th>Название</th><th>Кол-во участников</th><th>Город</th><th>Тип</th><th>Стена</th><th></th></tr>"
+
+        for (var i = 0; i < res.response.count; i++) {
+            var group = res.response.items[i];
+            console.log(group);
+            var color = "";
+            if (group.can_post == 1) {
+                color = "green";
+            } 
+            var openness = group.is_closed === 0 ? "Открытое" : "Закрытое";
+            var page_group = group.type === "page" ? "Страница" : "Группа";
+            var city = group.city === undefined ? "" : group.city.title;
+            var wall = group.wall === 0 ? "Выключена" : group.wall === 1 ? 
+                    "Открытая" : group.wall === 2 ? "Ограниченная" : "Закрытая";
+
+            var image = "<a target='_blank' href ='https://vk.com/" + group.screen_name + "'" + "><img src=" + group.photo_50 + "></a>";
+
+            var row = "<tr class = 'group "+ color + "'>" +
+                "<td>" + image + "</td>" +
+                "<td>" + group.name + "</td>" + 
+                "<td>" + group.members_count + "</td>" + 
+                "<td>" + city + "</td>" + 
+                "<td>" + page_group + " / " + openness +  "</td>" + 
+                "<td>" + wall +  "</td>" + 
+                "<td><input type='checkbox' value = '" + group.id + "'/></td>" + 
+                
+            "</tr>"
+
+            table += row;
+        }
+
+        $('#groups').append(table + "</table>");
+    }
+
+    function displayAllGroups() {
         $.ajax({
             dataType: 'jsonp',
             method: 'GET',
-            url: 'https://api.vk.com/method/groups.get?&access_token=' + TOKEN + '&v=5.62&extended=1&fields=can_post',
+            url: 'https://api.vk.com/method/groups.get?&access_token=' + TOKEN 
+                + '&v=5.103&extended=1&fields=can_post,members_count,city,wall',
             success: function(res) {
-                console.log(res);
-                for (var i = 0; i < res.response.count; i++) {
-                    var group = res.response.items[i];
-                    var color = "";
-                    if (group.can_post == 1) {
-                        color = "green";
-                    } 
-                    var image = "<a target='_blank' href ='https://vk.com/" + group.screen_name + "'" + "><img src=" + group.photo_50 + "></a>";
-                    var item = "<div class = 'group "+ color + "'> <div class ='group_name'>" + image + group.name 
-                            + "</div> <div class = 'options'> <input type='checkbox' value = '"+group.id+"'/></div> </div>";
-                    $('#groups').append(item);
-                }
-
-                //$('#name').append(res.response.first_name + " " + res.response.last_name);
-                //report.append(res.response + '<br>');
+                displayGroups(res);
             }
         });
     }
