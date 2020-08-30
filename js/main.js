@@ -12,6 +12,15 @@ $('document').ready(function() {
         e.preventDefault();
         var msg = $('#msg').val();
         var photo = $('#photo').val();
+        var video = $('#video').val();
+        var attach = "";
+        if (photo !== "") {
+            attach = photo;
+        }
+
+        if (video !== "") {
+            attach += "," + video;
+        }
 
         $('#goBtn').hide();
 
@@ -25,7 +34,8 @@ $('document').ready(function() {
         for (var i = 0; i < groups.length; i++) {
             if (groups[i].checked) {
                 interval++;
-                setTimeout(post, 1000 * delay * interval, groups[i], msg, photo);
+                setTimeout(post, 1000 * delay * interval, groups[i],
+                    msg, attach);
             }
         }
 
@@ -135,7 +145,7 @@ $('document').ready(function() {
         });
     };
 
-    function post(inputBox, msg, photo) {
+    function post(inputBox, msg, attach) {
         var id = $(inputBox).val();
         console.log(id);
 
@@ -143,7 +153,7 @@ $('document').ready(function() {
             dataType: 'jsonp',
             method: 'GET',
             url: 'https://api.vk.com/method/wall.post?owner_id=-' + id + '&message=' + msg 
-                            + '&attachments=' + photo + '&access_token=' + TOKEN + '&v=5.62', 
+                            + '&attachments=' + attach + '&access_token=' + TOKEN + '&v=5.62', 
             success: function(res) {
                 console.log(res);
                 $(inputBox).parent().css("background-color","green");
@@ -240,12 +250,13 @@ $('document').ready(function() {
 
         var members = $("#members").val();
         if (members == "") {
-            members = MAX;
+            members = 0;
         }
 
         $('#groups').html("");
         var table = "<table border='1'><tr><th></th><th>Название</th><th>Кол-во участников</th><th>Город</th><th>Тип</th><th>Стена</th><th></th></tr>"
 
+        console.log(res);
         for (var i = 0; i < res.length; i++) {
             var group = res[i];
 
