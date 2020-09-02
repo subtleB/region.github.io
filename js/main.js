@@ -51,6 +51,28 @@ $('document').ready(function() {
         //sendMsg(103767511, msg);
     });
 
+    $('#leaveGroups').click(function(e) {
+        e.preventDefault();
+
+        $('#leaveGroups').hide();
+
+        var delay = 1;
+
+        var interval = 0;
+        var groups = $('#groups').find("input");
+        for (var i = 0; i < groups.length; i++) {
+            if (groups[i].checked) {
+                interval++;
+                setTimeout(leave, 1000 * delay * interval, groups[i]);
+            }
+        }
+
+        setTimeout(function() {
+            $('#leaveGroups').show();
+        }, 1000);
+
+    });
+
     $('#joinGroups').click(function(e) {
         e.preventDefault();
 
@@ -128,6 +150,22 @@ $('document').ready(function() {
         }
         return ids;
     }
+
+    function leave(inputBox) {
+        var id = $(inputBox).val();
+        $.ajax({
+            dataType: 'jsonp',
+            method: 'GET',
+            url: 'https://api.vk.com/method/groups.leave?group_id=' + id + '&access_token=' + TOKEN + '&v=5.62', 
+            success: function(res) {
+                console.log(res);
+                $(inputBox).parent().css("background-color","green");
+                setTimeout(function() {
+                    $(inputBox).parent().css("background-color","initial");
+                }, 5000);
+            }
+        });
+    };
 
     function join(inputBox) {
         var id = $(inputBox).val();
